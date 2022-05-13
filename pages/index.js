@@ -1,4 +1,4 @@
-import { useState, createRef } from 'react'
+import { useState, createRef, useEffect } from 'react'
 import Head from 'next/head'
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -26,21 +26,25 @@ export default function Home() {
     fetch('https://eoql7b7hs2.execute-api.us-east-2.amazonaws.com/dev/v1/early-access', {
       method: 'POST',
       body: JSON.stringify({
-        email,
+        email: data,
       }),
       headers: {
         'Content-type': 'application/json; charset=UTF-8',
       },
     })
       .then((response) => response.json())
-      .then(() => setSuccessStatus(true))
-      .finally(() => setSuccessStatus(false));
+      .then((data) => {
+        if (data?.message) {
+          setSuccessStatus(data?.message)  
+        } else {
+          setSuccessStatus("Thank you for registration. We will notify you as soon as the app is available.")
+        }
+      })
+      .catch(() => setSuccessStatus("Something Went Wrong"));
   }
-
 
   const onSubmit = (e) => {
     e.preventDefault();
-    debugger;
     const recaptchaValue = recaptchaRef.current.getValue();
     if (!validateEmail(email)) {
       setEmailError('Enter valid Email!')
@@ -94,8 +98,17 @@ export default function Home() {
             />
           </div>
           <button className="p-3 text-lg flex-shrink-0 text-white bg-[#29564B]" type="submit">
-            Contact us
+            Early Access
           </button>
+          {successStatus === "Something Went Wrong" ? (
+            <div className='text-red-500'>
+              {successStatus}
+            </div>
+          ) : (
+            <div className='text-blue-500'>
+              {successStatus}
+            </div>
+          )}
         </form>
       </main>
     </div>
