@@ -82,7 +82,9 @@ export default function Home() {
               value={email}
               placeholder="Enter Your Email"
             />
-            {emailError}
+            <div className='text-red-500'>
+              {emailError}
+            </div>
           </div>
           <div className='my-3'>
             <ReCAPTCHA
